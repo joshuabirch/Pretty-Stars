@@ -1,25 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useRef } from 'react'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { Points, PointMaterial } from '@react-three/drei'
+import * as random from 'maath/random/dist/maath-random.esm'
 
-function App() {
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    <Canvas camera={{ position: [0, 0, 1] }}>
+      {/* <Overlay />  */}
+      <Stars />
+    </Canvas>
+  )
 }
 
-export default App;
+
+
+function Stars(props) {
+  const ref = useRef()
+  const [sphere] = useState(() => random.inSphere(new Float32Array(50000), { radius: 1 }))
+  useFrame((state, delta) => {
+    ref.current.rotation.x -= delta / 25
+    // ref.current.rotation.y -= delta / 35
+  })
+  return (
+    <group rotation={[0, 0, Math.PI / 2]}>
+      <Points ref={ref} positions={sphere} stride={3} frustumCulled={false} {...props}>
+        <PointMaterial transparent color="#ffa0e0" size={0.003} sizeAttenuation={true} depthWrite={false} />
+      </Points>
+    </group>
+  )
+}
